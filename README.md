@@ -12,3 +12,5 @@
 ## Design
 - My goal for the design of my app is for it to be simple but informative and easy to follow. Hopefully I will be able to use some of my digital designer background to help my app look very aesthetic. The home page will either be consisted of buttons to go to the different locations or it will be a series of inspirational and relatable quotes to couponing to keep the users entertained. In the menu bar there will be several options for the different features that I plan to have. Each page will have consistent design colors and text to make sure the user is focusing on the content. Hopefully I can include pictures and graphics to make the appeal of the app that much better. 
 
+##Presentation Link:
+- https://docs.google.com/presentation/d/1TnZgfcl9JSe8Fddbkr9DKshTnmobR--Ary5oo2W_I1o/edit#slide=id.p
