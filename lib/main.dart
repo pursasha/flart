@@ -1,6 +1,5 @@
 //Alexandra Gostev
 import 'package:flutter/material.dart';
-import 'package:flart/ShopList.dart';
 import 'package:flart/Policy.dart';
 import 'package:flart/Database.dart';
 
@@ -25,6 +24,7 @@ class MyHomePage extends StatefulWidget
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
 
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -34,11 +34,6 @@ class _MyHomePageState extends State<MyHomePage>
   final ShopList shop= ShopList();
   final Policy pol= Policy();
   final Database data= Database();
- /* int _counter = 0;
-  void _incrementCounter() 
-  {
-    setState((){ _counter++;});
-  }*/
 
   @override
   Widget build(BuildContext context) 
@@ -72,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage>
         (
           children: <Widget>
           [
-            //first tab button option
+            //1st tab button option
             FlatButton
             (
               onPressed:()
@@ -84,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage>
               color: Colors.grey[300],
             ),
           
-            //second tab option
+            //2nd tab option
             FlatButton
             (
               onPressed:()
@@ -121,13 +116,50 @@ class _MyHomePageState extends State<MyHomePage>
           ],
         ),
       ),
+    );
+  }
 
-      /*floatingActionButton: FloatingActionButton
+}
+class ShopList extends State<MyHomePage>
+{
+
+    bool clicked = false;
+
+  @override
+  void initState() { 
+    super.initState();
+    clicked = false;
+    setState(() {
+      
+    });
+  }
+  Widget build(BuildContext context) 
+  {
+    return Scaffold(
+      appBar: AppBar
       (
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),*/
+        title: Text("Shopping List"),
+      ),
+      body: Center(
+      child:
+      ListView.builder( 
+        itemBuilder:(context, index) => 
+        ListTile(
+          leading: Checkbox(
+            value: clicked,
+            tristate: true,
+            onChanged: (changer)
+            {
+              setState((){
+              clicked = changer;
+              });
+            }
+          ),
+          title: Text("Hi"),
+        ) ,
+        itemCount: 3
+        ,)
+      ),
     );
   }
 }
