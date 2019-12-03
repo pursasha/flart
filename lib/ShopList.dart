@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Components/Deal.dart';
+import 'Components/shoppingDatabase.dart';
 
 class ShopList extends StatefulWidget {
   ShopList({Key key}) : super(key: key);
@@ -12,43 +13,65 @@ class _ShopListState extends State<ShopList> {
   final _formKey = new GlobalKey<FormState>();
 
   TextEditingController storeController = TextEditingController();
-  TextEditingController itemController1 = TextEditingController();
-  TextEditingController itemController2 = TextEditingController();
-  TextEditingController itemController3 = TextEditingController();
-  TextEditingController dealController1 = TextEditingController();
-  TextEditingController dealController2 = TextEditingController();
-  TextEditingController dealController3 = TextEditingController();
+  TextEditingController itemController = TextEditingController();
+  TextEditingController couponController1 = TextEditingController();
+  TextEditingController couponController2 = TextEditingController();
+  TextEditingController couponController3 = TextEditingController();
+  TextEditingController couponController4 = TextEditingController();
 
-  List<Deal> deals = [
-    Deal("CVS", false, [
-      Item("Shampoo", false,
-          [Coupon("BOGO", false), Coupon("Use \$3 Deals", false)]),
-      Item("Shampoo", false, [Coupon("Spend \$20, Get \$4", false)]),
-    ]),
-    Deal("CVS", false, [
-      Item("Shampoo", false,
-          [Coupon("BOGO", false), Coupon("Use \$3 Deals", false)]),
-      Item("Shampoo", false, [Coupon("Spend \$20, Get \$4", false)]),
-      Item("Shampoo", false,
-          [Coupon("BOGO", false), Coupon("Use \$3 Deals", false)]),
-      Item("Shampoo", false, [Coupon("Spend \$20, Get \$4", false)]),
-      Item("Shampoo", false,
-          [Coupon("BOGO", false), Coupon("Use \$3 Deals", false)]),
-      Item("Shampoo", false, [Coupon("Spend \$20, Get \$4", false)]),
-    ]),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    build(context);
+  }
 
   Widget build(BuildContext context) {
-    ListView body = ListView.builder(
-      itemCount: deals.length,
-      itemBuilder: (context, int index) => buildStore(deals[index]),
-    );
-
     return Scaffold(
       appBar: AppBar(
+        actions: <Widget>[
+          FlatButton(
+            child: Icon(Icons.restore_from_trash),
+            onPressed: () => DealDB.db.removeAllDeals(),
+          )
+        ],
         title: Text("Shopping List"),
       ),
-      body: body.build(context),
+      body: FutureBuilder<List<Deal>>(
+          future: DealDB.db.deals(),
+          builder: (BuildContext context, AsyncSnapshot<List<Deal>> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.done:
+                List<Deal> deals = snapshot.data;
+                if (deals.length > 0) {
+                  return ListView.builder(
+                    itemCount: deals.length,
+                    itemBuilder: (context, int index) =>
+                        buildStore(deals[index]),
+                  );
+                } else {
+                  return ListView.builder(
+                    itemCount: 1,
+                    itemBuilder: (context, int index) => Center(
+                      child: Text(
+                        "Add a deal...",
+                        style: TextStyle(fontSize: 28),
+                      ),
+                    ),
+                  );
+                }
+                break;
+              case ConnectionState.active:
+              case ConnectionState.waiting:
+              default:
+                return ListView.builder(
+                  itemCount: 1,
+                  itemBuilder: (context, int index) => Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+                break;
+            }
+          }),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () => showDialog(
@@ -63,77 +86,65 @@ class _ShopListState extends State<ShopList> {
 
   Card buildStore(Deal deal) {
     List<Card> items = [];
-    for (Item item in deal.items) {
-      items.add(buildItem(item));
-    }
+    items.add(buildItem(deal));
     return Card(
-      clipBehavior: Clip.hardEdge,
-      child: Center(
-        heightFactor: 10,
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Text(
-                  deal.store,
-                  style: TextStyle(fontSize: 36),
-                )
-              ],
-            ),
-            Column(
-              children: items,
-            )
-          ],
-        ),
+      child: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                deal.store,
+                style: TextStyle(fontSize: 36),
+              ),
+            ],
+          ),
+          Column(
+            children: items,
+          )
+        ],
       ),
     );
   }
 
-  Card buildItem(Item item) {
-    List<Card> coupons = [];
-    for (Coupon coupon in item.coupons) {
-      coupons.add(buildCoupon(coupon));
+  Card buildItem(Deal deal) {
+    List<Row> coupons = [];
+    coupons.add(Row(
+      children: <Widget>[
+        Text(
+          deal.item.title,
+          style: TextStyle(fontSize: 24),
+        )
+      ],
+    ));
+    for (Coupon coupon in deal.item.coupon) {
+      print(coupon.title);
+
+      coupons.add(
+        Row(
+          children: <Widget>[
+            Text(coupon.title),
+          ],
+        ),
+      );
     }
 
     return Card(
+      margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
       elevation: 0,
-      child: Center(
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Text(
-                  item.title,
-                  style: TextStyle(fontSize: 24),
-                )
-              ],
-            ),
-            Column(
-              children: coupons,
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Card buildCoupon(Coupon coupon) {
-    return Card(
-      borderOnForeground: false,
-      child: Center(
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Checkbox(
-                  value: coupon.have,
-                  onChanged: (have) => setState(() => coupon.have = have),
-                ),
-                Text(coupon.title)
-              ],
-            )
-          ],
-        ),
+      child: Column(
+        children: <Widget>[
+          CheckboxListTile(
+            value: deal.have,
+            controlAffinity: ListTileControlAffinity.leading,
+            onChanged: (changer) {
+              setState(() {
+                deal.have = changer;
+              });
+            },
+            title: Column(children: coupons),
+          ),
+        ],
       ),
     );
   }
@@ -145,11 +156,12 @@ class _ShopListState extends State<ShopList> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Column(
+            // STORE
             children: <Widget>[
               Text(
                 "Store",
                 style: TextStyle(
-                    fontSize: 28, decoration: TextDecoration.underline),
+                    fontSize: 36, decoration: TextDecoration.underline),
               ),
               TextFormField(
                 controller: storeController,
@@ -165,16 +177,44 @@ class _ShopListState extends State<ShopList> {
           Padding(
             padding: EdgeInsets.symmetric(vertical: 20.0),
           ),
+          Column(children: <Widget>[
+            // ITEM
+            Center(
+              child: Text(
+                "Item",
+                style: TextStyle(fontSize: 30),
+              ),
+            ),
+            TextFormField(
+              controller: itemController,
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
+            ),
+          ]),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.0),
+          ),
           Column(
+            // COUPONS
             children: <Widget>[
-              TextFormField(
-                controller: itemController1,
+              Center(
+                child: Text("Coupons"),
               ),
               TextFormField(
-                controller: itemController2,
+                controller: couponController1,
               ),
               TextFormField(
-                controller: itemController3,
+                controller: couponController2,
+              ),
+              TextFormField(
+                controller: couponController3,
+              ),
+              TextFormField(
+                controller: couponController4,
               ),
             ],
           ),
@@ -186,51 +226,43 @@ class _ShopListState extends State<ShopList> {
                   if (_formKey.currentState.validate()) {
                     setState(
                       () {
-                        deals.add(Deal(storeController.text, false, [
-                          Item(
-                              itemController1.text.isNotEmpty
-                                  ? itemController1.text
-                                  : "",
-                              false,
+                        DealDB.db.insertDeal(
+                          Deal(
+                            storeController.text,
+                            false,
+                            Item(
+                              itemController.text,
                               [
                                 Coupon(
-                                    (dealController1.text.isNotEmpty
-                                        ? dealController1.text
-                                        : ""),
-                                    false)
-                              ]),
-                          Item(
-                              itemController2.text.isNotEmpty
-                                  ? itemController2.text
-                                  : "",
-                              false,
-                              [
+                                  (couponController1.text.isNotEmpty
+                                      ? couponController1.text
+                                      : ""),
+                                ),
                                 Coupon(
-                                    dealController2.text.isNotEmpty
-                                        ? dealController2.text
-                                        : "",
-                                    false)
-                              ]),
-                          Item(
-                              itemController3.text.isNotEmpty
-                                  ? itemController3.text
-                                  : "",
-                              false,
-                              [
+                                  (couponController2.text.isNotEmpty
+                                      ? couponController2.text
+                                      : ""),
+                                ),
                                 Coupon(
-                                    dealController3.text.isNotEmpty
-                                        ? dealController3.text
-                                        : "",
-                                    false)
-                              ]),
-                        ]));
+                                  (couponController3.text.isNotEmpty
+                                      ? couponController3.text
+                                      : ""),
+                                ),
+                                Coupon(
+                                  (couponController4.text.isNotEmpty
+                                      ? couponController4.text
+                                      : ""),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
                         storeController.clear();
-                        itemController1.clear();
-                        itemController2.clear();
-                        itemController3.clear();
-                        dealController1.clear();
-                        dealController2.clear();
-                        dealController3.clear();
+                        itemController.clear();
+                        couponController1.clear();
+                        couponController2.clear();
+                        couponController3.clear();
+                        couponController4.clear();
                       },
                     );
                     Navigator.of(context).pop();

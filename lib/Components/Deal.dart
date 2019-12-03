@@ -1,33 +1,52 @@
 class Deal {
   String store;
   bool have;
-  List<Item> items;
+  Item item;
 
-  Deal(String store, bool have, List<Item> items) {
+  Deal(String store, bool have, Item item) {
     this.store = store;
     this.have = have;
-    this.items = items;
+    this.item = item;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'store': store,
+      'have': (have == true) ? 1 : 0,
+      'item': item.title,
+      'coupon': item.coupon.toString()
+    };
   }
 }
 
 class Item {
   String title;
-  bool have;
-  List<Coupon> coupons;
+  List<Coupon> coupon;
 
-  Item(String title, bool have, List<Coupon> coupons) {
+  Item(String title, [List<Coupon> coupon]) {
     this.title = title;
-    this.have = have;
-    this.coupons = coupons;
+    this.coupon = coupon;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {'title': title, 'coupons': coupon.toString()};
+  }
+
+  @override
+  String toString() {
+    return 'title: $title, coupons:' + coupon.toString();
   }
 }
 
 class Coupon {
   String title;
-  bool have;
 
-  Coupon(String title, bool have) {
+  Coupon(String title) {
     this.title = title;
-    this.have = have;
+  }
+
+  @override
+  String toString() {
+    return 'title: $title';
   }
 }
