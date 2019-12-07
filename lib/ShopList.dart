@@ -66,8 +66,8 @@ class _ShopListState extends State<ShopList> {
                 return ListView.builder(
                   itemCount: 1,
                   itemBuilder: (context, int index) => Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                      // child: CircularProgressIndicator(),
+                      ),
                 );
                 break;
             }
@@ -138,9 +138,8 @@ class _ShopListState extends State<ShopList> {
             value: deal.have,
             controlAffinity: ListTileControlAffinity.leading,
             onChanged: (changer) {
-              setState(() {
-                deal.have = changer;
-              });
+              DealDB.db.haveDeal(deal.id, changer);
+              setState(() {});
             },
             title: Column(children: coupons),
           ),

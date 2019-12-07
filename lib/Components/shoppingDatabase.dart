@@ -75,8 +75,15 @@ class DealDB {
         });
       });
       return Deal(maps[i]['store'], (maps[i]['have'] == 1 ? true : false),
-          Item(maps[i]['item'], coupons));
+          Item(maps[i]['item'], coupons), maps[i]['id']);
     });
+  }
+
+  void haveDeal(int id, bool have) async {
+    final db = await openDB();
+
+    await db.update('deals', {'have': (have == true ? 1 : 0)},
+        where: "id = ?", whereArgs: [id]);
   }
 
   Future<void> deleteDeal(String store) async {

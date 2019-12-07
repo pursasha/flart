@@ -1,9 +1,11 @@
 class Deal {
+  int id;
   String store;
   bool have;
   Item item;
 
-  Deal(String store, bool have, Item item) {
+  Deal(String store, bool have, Item item, [int id]) {
+    this.id = id;
     this.store = store;
     this.have = have;
     this.item = item;
@@ -11,6 +13,7 @@ class Deal {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'store': store,
       'have': (have == true) ? 1 : 0,
       'item': item.title,
