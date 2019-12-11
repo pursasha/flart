@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'Components/Deal.dart';
 import 'Components/shoppingDatabase.dart';
 
@@ -144,7 +145,8 @@ class _ShopListState extends State<ShopList> {
               DealDB.db.haveDeal(deal.id, changer);
               setState(() {});
             },
-            title: Column(children: coupons),
+            title: Column(
+                children: coupons), //the column with item and all the coupons
           ),
         ],
       ),
@@ -152,21 +154,49 @@ class _ShopListState extends State<ShopList> {
   }
 
   Form newDealForm() {
+    ScrollController form = new ScrollController();
     return Form(
       key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Column(
-            // STORE
-            children: <Widget>[
-              Text(
-                "Store",
-                style: TextStyle(
-                    fontSize: 36, decoration: TextDecoration.underline),
+      child: ListView.builder(
+        controller: form,
+        itemCount: 1,
+        itemBuilder: (context, int x) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.0),
+            ),
+            Column(
+              // STORE
+              children: <Widget>[
+                Text(
+                  "Store",
+                  style: TextStyle(fontSize: 24),
+                ),
+                TextFormField(
+                  controller: storeController,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some text';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.0),
+            ),
+            Column(children: <Widget>[
+              // ITEM
+              Center(
+                child: Text(
+                  "Item",
+                  style: TextStyle(fontSize: 24),
+                ),
               ),
               TextFormField(
-                controller: storeController,
+                controller: itemController,
                 validator: (value) {
                   if (value.isEmpty) {
                     return 'Please enter some text';
@@ -174,107 +204,86 @@ class _ShopListState extends State<ShopList> {
                   return null;
                 },
               ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.0),
-          ),
-          Column(children: <Widget>[
-            // ITEM
+            ]),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.0),
+            ),
+            Column(
+              // COUPONS
+              children: <Widget>[
+                Center(
+                  child: Text("Coupons", style: TextStyle(fontSize: 24)),
+                ),
+                TextFormField(
+                  controller: couponController1,
+                ),
+                TextFormField(
+                  controller: couponController2,
+                ),
+                TextFormField(
+                  controller: couponController3,
+                ),
+                TextFormField(
+                  controller: couponController4,
+                ),
+              ],
+            ),
             Center(
-              child: Text(
-                "Item",
-                style: TextStyle(fontSize: 30),
-              ),
-            ),
-            TextFormField(
-              controller: itemController,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-            ),
-          ]),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.0),
-          ),
-          Column(
-            // COUPONS
-            children: <Widget>[
-              Center(
-                child: Text("Coupons"),
-              ),
-              TextFormField(
-                controller: couponController1,
-              ),
-              TextFormField(
-                controller: couponController2,
-              ),
-              TextFormField(
-                controller: couponController3,
-              ),
-              TextFormField(
-                controller: couponController4,
-              ),
-            ],
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: RaisedButton(
-                onPressed: () {
-                  if (_formKey.currentState.validate()) {
-                    setState(
-                      () {
-                        DealDB.db.insertDeal(
-                          Deal(
-                            storeController.text,
-                            false,
-                            Item(
-                              itemController.text,
-                              [
-                                Coupon(
-                                  (couponController1.text.isNotEmpty
-                                      ? couponController1.text
-                                      : ""),
-                                ),
-                                Coupon(
-                                  (couponController2.text.isNotEmpty
-                                      ? couponController2.text
-                                      : ""),
-                                ),
-                                Coupon(
-                                  (couponController3.text.isNotEmpty
-                                      ? couponController3.text
-                                      : ""),
-                                ),
-                                Coupon(
-                                  (couponController4.text.isNotEmpty
-                                      ? couponController4.text
-                                      : ""),
-                                ),
-                              ],
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: RaisedButton(
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      setState(
+                        () {
+                          DealDB.db.insertDeal(
+                            Deal(
+                              storeController.text,
+                              false,
+                              Item(
+                                itemController.text,
+                                [
+                                  Coupon(
+                                    (couponController1.text.isNotEmpty
+                                        ? couponController1.text
+                                        : ""),
+                                  ),
+                                  Coupon(
+                                    (couponController2.text.isNotEmpty
+                                        ? couponController2.text
+                                        : ""),
+                                  ),
+                                  Coupon(
+                                    (couponController3.text.isNotEmpty
+                                        ? couponController3.text
+                                        : ""),
+                                  ),
+                                  Coupon(
+                                    (couponController4.text.isNotEmpty
+                                        ? couponController4.text
+                                        : ""),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                        storeController.clear();
-                        itemController.clear();
-                        couponController1.clear();
-                        couponController2.clear();
-                        couponController3.clear();
-                        couponController4.clear();
-                      },
-                    );
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: Text('Submit'),
+                          );
+                          storeController.clear();
+                          itemController.clear();
+                          couponController1.clear();
+                          couponController2.clear();
+                          couponController3.clear();
+                          couponController4.clear();
+                        },
+                      );
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Text('Submit'),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
