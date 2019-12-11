@@ -31,7 +31,10 @@ class _ShopListState extends State<ShopList> {
         actions: <Widget>[
           FlatButton(
             child: Icon(Icons.restore_from_trash),
-            onPressed: () => DealDB.db.removeAllDeals(),
+            onPressed: () {
+              DealDB.db.removeAllDeals();
+              setState(() {});
+            },
           )
         ],
         title: Text("Shopping List"),
